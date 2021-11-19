@@ -1,0 +1,27 @@
+{
+    "string1": "Just",
+    "string2": "Do",
+    "string3": "It",
+    "_ansible_check_mode": false,
+    "_ansible_no_log": false,
+    "_ansible_debug": false,
+    "_ansible_diff": false,
+    "_ansible_verbosity": 4,
+    "_ansible_version": "2.9.14",
+    "_ansible_module_name": "example_module",
+    "_ansible_syslog_facility": "LOG_USER",
+    "_ansible_selinux_special_fs": [
+        "fuse",
+        "nfs",
+        "vboxsf",
+        "ramfs",
+        "9p",
+        "vfat"
+    ],
+    "_ansible_string_conversion_action": "warn",
+    "_ansible_socket": null,
+    "_ansible_shell_executable": "/bin/sh",
+    "_ansible_keep_remote_files": false,
+    "_ansible_tmpdir": "/home/ansible/.ansible/tmp/ansible-tmp-1635935772.1203327-90948-238773199697475/",
+    "_ansible_remote_tmp": "~/.ansible/tmp"
+}

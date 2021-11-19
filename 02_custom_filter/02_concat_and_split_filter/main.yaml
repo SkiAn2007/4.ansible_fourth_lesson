@@ -1,0 +1,17 @@
+---
+- name: test
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    string1: abc
+    string2: def
+    string3: "All work and no play makes Jack a dull boy"
+  tasks:
+    - name: concat two strings filter
+      debug:
+        msg: "{{ string1 | concat_filter(string2) }}"
+
+    - name: split string filter
+      debug:
+        msg: "{{ string3 | split_filter() }}"

@@ -1,0 +1,11 @@
+- name: ansible-debugger
+  hosts: nodes
+  strategy: debug
+  gather_facts: true
+  vars:
+    var1: value1
+    var2: value2
+  tasks:
+    - name: task without variable
+      debug:
+        msg: "{{ var3 }}"

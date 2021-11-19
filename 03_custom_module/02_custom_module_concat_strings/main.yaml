@@ -1,0 +1,27 @@
+- name: test module
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Example module
+      example_sh:
+        string1: Just
+        string2: Do
+        string3: It
+      register: bash_result
+
+    - name: print result
+      debug:
+        msg: "{{ bash_result }}"
+
+    - name: Example module
+      example_py:
+        string1: Just
+        string2: Do
+        string3: It
+      register: py_result
+
+    - name: print result
+      debug:
+        msg: "{{ py_result }}"
+    

@@ -1,0 +1,9 @@
+---
+- name: test filter
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: debug
+      debug:
+        msg: "{{ 'string' | filter_function }}"

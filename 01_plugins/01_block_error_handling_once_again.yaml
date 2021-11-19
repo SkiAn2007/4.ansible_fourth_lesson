@@ -1,0 +1,37 @@
+- name: get facts playbook
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: error handling block
+    block:
+      - name: debug
+        debug:
+          msg: "You will see failed tasks after this"
+
+      - name: always changed
+        debug:
+          msg: i change status
+        changed_when: true
+
+      - name: always failed
+        debug:
+          msg: i fail status
+        failed_when: true
+
+      - name: unreachable debug
+        debug:
+          msg: "You won't see this message"
+    rescue:
+      - name: emergency debug
+        debug:
+          msg: "This task will be executed in case of block tasks failure"
+
+      - name: also failed
+        debug:
+          msg: i also fail status
+        failed_when: true
+    always:
+      - name: final debug
+        debug:
+          msg: "This task will always be executed"
