@@ -1,4 +1,3 @@
 [nodes]
 localhost sleep_seconds=1
-test-panteleev-ansible-node2.unix.tensor.ru sleep_seconds=6
-test-panteleev-ansible-course.unix.tensor.ru sleep_seconds=10
+ansible-node1 sleep_seconds=6
