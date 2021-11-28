@@ -20,4 +20,3 @@
     - name: print result
       debug:
         msg: "{{ py_result }}"
-    
