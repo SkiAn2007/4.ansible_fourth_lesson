@@ -3,15 +3,7 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  vars:
-    string1: abc
-    string2: def
-    string3: "1, 2 3,  4, 5 6"
   tasks:
-    # - name: concat two strings filter
-    #   debug:
-    #     msg: "{{ string1 | concat_filter(string2) }}"
-
-    - name: split string filter
+    - name: debug
       debug:
-        msg: "{{ string3 | split_filter(',') }}"
+        msg: "{{ 'string' | filter_function }}"
