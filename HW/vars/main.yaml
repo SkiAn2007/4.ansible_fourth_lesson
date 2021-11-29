@@ -15,7 +15,6 @@ php_packages_list:
   - php-xml
   - php-zip
 
-
 # nginx vars
 nginx_port: 80
 server_hostname: ansible-node1.localdomain
