@@ -1,4 +1,9 @@
 #!/usr/bin/python
+
+# from ansible.errors import (
+#     AnsibleFilterTypeError
+# )
+
 def filter_function(variable):
     '''
         function doc
