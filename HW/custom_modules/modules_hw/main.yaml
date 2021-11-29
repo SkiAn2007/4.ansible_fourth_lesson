@@ -1,0 +1,9 @@
+---
+- name: Check site's availability
+  hosts: nodes
+  gather_facts: false
+  tasks:
+    - name: healthcheck
+      healthcheck_py:
+        addr: "ansible-node1.localdomain"
+        tls: false
