@@ -9,11 +9,11 @@ name=Safe Remi's RPM repository for Enterprise Linux 7 - $basearch
 mirrorlist=http://cdn.remirepo.net/enterprise/7/safe/mirror
 enabled=1
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
+gpgkey=https://rpms.remirepo.net/RPM-GPG-KEY-remi
 
 [remi-safe-debuginfo]
 name=Remi's RPM repository for Enterprise Linux 7 - $basearch - debuginfo
 baseurl=http://rpms.remirepo.net/enterprise/7/debug-remi/$basearch/
 enabled=0
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi
+gpgkey=https://rpms.remirepo.net/RPM-GPG-KEY-remi
