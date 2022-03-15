@@ -25,10 +25,14 @@
         msg: "{{ lookup('dict', users) }}"
     - name: Print phone records
       debug:
-        msg: "User {{ item.key }} is {{ item.value.name }} ({{ item.value.telephone }})"
+        msg: "User {{ client.key }} is {{ client.value.name }} ({{ client.value.telephone }})"
       loop: "{{ lookup('dict', users) }}"
+      loop_control:
+        loop_var: client
     - name: set_fact when alice in key
       debug:
         msg: "User alice exists"
       loop: "{{ lookup('dict', users) }}"
-      when: "'alice' in item.key"
+      loop_control:
+        loop_var: client
+      when: "'alice' in client.key"
