@@ -6,10 +6,13 @@
   gather_facts: false
   tasks:
     - name: first task
-      shell: sleep "{{ sleep_seconds }}"
+      command: sleep "{{ sleep_seconds }}"
+      changed_when: false
 
     - name: second task
-      shell: sleep "{{ sleep_seconds }}"
+      command: sleep "{{ sleep_seconds }}"
+      changed_when: false
 
     - name: third task
-      shell: sleep "{{ sleep_seconds }}"
+      command: sleep "{{ sleep_seconds }}"
+      changed_when: false
