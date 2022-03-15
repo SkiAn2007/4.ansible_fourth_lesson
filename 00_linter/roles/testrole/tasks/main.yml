@@ -1,0 +1,6 @@
+---
+# tasks file for testrole
+- name: included role with linting problems 
+  debug:  
+    msg: "this task has trailing spaces" 
+  

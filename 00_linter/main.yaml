@@ -1,0 +1,21 @@
+---
+- name: playbook for linting
+  hosts: nodes
+  tasks: 
+    - name: trailing space example 
+      debug: 
+        msg: "this task has lots of trailing spaces"    
+
+    - name: command without changed_when
+      command: "whoami"
+
+    - debug:
+        msg: "unnamed task"
+
+    - name: include role with lint problems
+      include_role: 
+        name: testrole
+
+    - name: no new line
+      debug:
+        msg: "there's no newline at the end of yaml-file"
