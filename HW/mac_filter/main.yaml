@@ -1,0 +1,11 @@
+---
+- name: hw4-1
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    mac_string: 'aabbccddeeff'
+  tasks:
+    - name: convert string to mac format
+      debug:
+        msg: "{{ mac_string | mac_normalizer() }}"
