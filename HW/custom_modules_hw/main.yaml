@@ -3,7 +3,11 @@
   hosts: nodes
   gather_facts: false
   tasks:
-    - name: healthcheck
+    - name: healthcheck-python
       healthcheck_py:
+        addr: "portal.plk32.local"
+        tls: false
+    - name: healthcheck-bash
+      healthcheck_sh:
         addr: "portal.plk32.local"
         tls: false
