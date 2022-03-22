@@ -1,0 +1,31 @@
+---
+- name: install php-fpm packages
+  block:
+    - name: Put repo files to /etc/yum.repos.d/ directory
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/yum.repos.d/"
+        owner: root
+        group: root
+        mode: 0644
+      with_fileglob: "*.repo"
+
+    - name: Install packages from 'php_packages_list'
+      package:
+        name: "{{ php_packages_list }}"
+        state: present
+
+    - name: Remove default /etc/php-fpm.d/www.conf file
+      file:
+        path: /etc/php-fpm.d/www.conf
+        state: absent
+      notify: restart php-fpm
+
+    - name: Copy wordpress.conf from files to /etc/php-fpm.d/wordpress.conf
+      copy:
+        src: wordpress.conf
+        dest: /etc/php-fpm.d/wordpress.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart php-fpm

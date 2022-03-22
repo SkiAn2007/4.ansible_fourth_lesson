@@ -1,0 +1,61 @@
+---
+    - name: generate ssl certs for nginx
+      block:
+        - name: install libselinux-python3
+          yum:
+            name: libselinux-python3
+            update_cache: true
+            state: present
+
+        - name: install setuptools-rust for crypto lib
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+          pip:
+            name: setuptools-rust
+
+        - name: upgrade pip
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+          pip:
+            name: pip
+            extra_args: --upgrade
+
+        - name: install crypto lib to satisfy req. for generating cert
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+          pip:
+            name: cryptography
+        - name: Create nginx directory
+          file:
+            path: /etc/nginx
+            state: directory
+            owner: root
+            group: root
+            mode: 0755
+        - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
+          community.crypto.openssl_privatekey:
+            path: "{{ ssl_certificate_key }}"
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+
+        - name: Create certificate signing request (CSR) for self-signed certificate
+          community.crypto.openssl_csr_pipe:
+            privatekey_path: "{{ ssl_certificate_key }}"
+            common_name: "{{ ansible_host }}"
+            organization_name: Andrey Skipin
+            subject_alt_name:
+              - "DNS:{{ ansible_host }}"
+              - "DNS:www.{{ ansible_host }}"
+          register: csr
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+
+        - name: Create self-signed certificate from CSR
+          community.crypto.x509_certificate:
+            path: "{{ ssl_certificate }}"
+            csr_content: "{{ csr.csr }}"
+            privatekey_path: "{{ ssl_certificate_key }}"
+            provider: selfsigned
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+

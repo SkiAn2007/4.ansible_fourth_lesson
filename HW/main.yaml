@@ -1,0 +1,25 @@
+---
+- name: hw4task3
+  hosts: nodes
+  become: true
+  gather_facts: true
+  vars:
+    nginx_tls_port: 443
+    nginx_no_tls_port: 80
+  roles:
+    - role: generatecerts
+    - role: nginx_tls
+    - role: mariadb
+    - role: php_fpm
+    - role: wordpress_project
+
+  post_tasks:
+    - name: check web site from control server
+      uri:
+        url: "https://{{ ansible_host }}:{{ nginx_tls_port }}"
+        return_content: true
+        validate_certs: false   # as far as we use self signed
+      connection: local
+      register: example_webpage_out
+      failed_when: example_webpage_out.status != 200
+

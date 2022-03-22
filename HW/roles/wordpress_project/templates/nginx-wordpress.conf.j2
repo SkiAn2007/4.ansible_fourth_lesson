@@ -1,5 +1,5 @@
 server {
-        listen       {{ nginx_tls_port }} ssl http2;
+        listen       {{ nginx_tls_port }} ssl http2 default_server;
         server_name  {{ server_hostname }};
         root /srv/wordpress/ ;
 

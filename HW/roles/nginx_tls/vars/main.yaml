@@ -1,0 +1,4 @@
+---
+ssl_certificate: "/etc/nginx/{{ ansible_host }}.pem"
+ssl_certificate_key: "/etc/nginx/{{ ansible_host }}.key"
+server_hostname: ansible-node1.localdomain

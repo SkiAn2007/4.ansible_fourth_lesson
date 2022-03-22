@@ -1,0 +1,15 @@
+---
+- name: install MariaDB
+  block:
+    - name: Install 'mariadb-server' and 'MySQL-python' packages
+      package:
+        name:
+          - mariadb-server
+          - MySQL-python
+        state: present
+
+    - name: Ensure 'mariadb' service is started and enabled
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
