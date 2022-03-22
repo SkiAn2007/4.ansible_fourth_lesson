@@ -1,53 +1,195 @@
 ---
 - name: install php-fpm packages and wordpress
+  hosts: nodes
+  become: true
   vars_files:
     - vars/main.yaml
+  vars:
+    ssl_certificate: "/etc/nginx/{{ ansible_host }}.pem"
+    ssl_certificate_key: "/etc/nginx/{{ ansible_host }}.key"
   tasks:
+    - name: prepare ssl certificates
+      block:
+        - name: install libselinux-python3
+          yum:
+            name: libselinux-python3
+            update_cache: true
+            state: present
+
+        - name: install setuptools-rust for crypto lib
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+          pip:
+            name: setuptools-rust
+
+        - name: upgrade pip
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+          pip:
+            name: pip
+            extra_args: --upgrade
+
+        - name: install crypto lib to satisfy req. for generating cert
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+          pip:
+            name: cryptography
+
+        - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
+          community.crypto.openssl_privatekey:
+            path: "{{ ssl_certificate_key }}"
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+
+        - name: Create certificate signing request (CSR) for self-signed certificate
+          community.crypto.openssl_csr_pipe:
+            privatekey_path: "{{ ssl_certificate_key }}"
+            common_name: "{{ ansible_host }}"
+            organization_name: Andrey Skipin
+            subject_alt_name:
+              - "DNS:{{ ansible_host }}"
+              - "DNS:www.{{ ansible_host }}"
+          register: csr
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+
+        - name: Create self-signed certificate from CSR
+          community.crypto.x509_certificate:
+            path: "{{ ssl_certificate }}"
+            csr_content: "{{ csr.csr }}"
+            privatekey_path: "{{ ssl_certificate_key }}"
+            provider: selfsigned
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
+
     - name: Copy nginx configuration from template for wordpress
+      template:
+        src: templates/nginx-wordpress.conf.j2
+        dest: /etc/nginx/conf.d/nginx-wordpress.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart nginx
 
     - name: Put repo files to /etc/yum.repos.d/ directory
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/yum.repos.d/"
+        owner: root
+        group: root
+        mode: 0644
+      with_fileglob: "*.repo"
 
     - name: Install packages from 'php_packages_list'
+      package:
+        name: "{{ php_packages_list }}"
+        state: latest
 
     - name: Remove default /etc/php-fpm.d/www.conf file
+      file:
+        path: /etc/php-fpm.d/www.conf
+        state: absent
+      notify: restart php-fpm
 
     - name: Copy wordpress.conf from files to /etc/php-fpm.d/wordpress.conf
+      copy:
+        src: wordpress.conf
+        dest: /etc/php-fpm.d/wordpress.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart php-fpm
 
     - name: >
         Download WordPress from http://wordpress.org/wordpress-{{ wp_version }}.tar.gz
         to /srv/ folder + checksum
       get_url:
+        url: "http://wordpress.org/wordpress-{{ wp_version }}.tar.gz"
+        dest: "/tmp/wordpress-{{ wp_version }}.tar.gz"
+        checksum: "{{ wp_checksum }}"
 
     - name: Unarchive wordpress to /srv folder
       unarchive:
+        src: "/tmp/wordpress-{{ wp_version }}.tar.gz"
+        dest: /srv
+        remote_src: yes
 
     - name: Add linux group "wordpress"
       group:
+        name: wordpress
+        state: present
 
     - name: >
         Add linux user "wordpress" with group "wordpress"
         and /srv/wordpress as homedir
       user:
+        name: wordpress
+        shell: /bin/bash
+        groups: wordpress
+        home: /srv/wordpress
 
     - name: Create mariadb database for wordpress
       mysql_db:
+        name: "{{ wp_db_name }}"
+        encoding: utf8
+        state: present
 
     - name: Create WordPress database user
       mysql_user:
+        name: "{{ wp_db_user }}"
+        password: "{{ wp_db_password }}"
+        priv: "{{ wp_db_name }}.*:ALL"
+        state: present
+      no_log: true
 
     - name: >
         Copy WordPress config file from templates
         to /srv/wordpress/wp-config.php
+      template:
+        src: templates/wp-config.php
+        dest: /srv/wordpress/wp-config.php
+        mode: 0444
 
     - name: >
         /srv/wordpress directory recursive rights
         for wordpress user and group
       file:
+        path: /srv/wordpress
+        state: directory
+        recurse: yes
+        owner: wordpress
+        group: wordpress
 
     - name: Start php-fpm Service
+      systemd:
+        name: php-fpm
+        state: started
+        enabled: yes
+
+    - name: Start mariadb Service
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+  post_tasks:
+    - name: check web site from control server
+      uri:
+        url: "https://{{ server_hostname }}:{{ nginx_tls_port }}"
+        return_content: true
+        validate_certs: false   # as far as we use self signed
+      connection: local
+      register: example_webpage_out
+      failed_when: example_webpage_out.status != 200
 
   handlers:
     - name: restart php-fpm
+      service:
+        name: php-fpm
+        state: restarted
 
     - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
 
