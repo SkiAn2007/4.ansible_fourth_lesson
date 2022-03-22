@@ -5,5 +5,5 @@
   tasks:
     - name: healthcheck
       healthcheck_py:
-        addr: "ansible-node1.localdomain"
+        addr: "portal.plk32.local"
         tls: false

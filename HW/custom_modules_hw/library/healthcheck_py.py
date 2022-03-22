@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from ansible.module_utils.basic import AnsibleModule
+import requests as r
 
 DOCUMENTATION = r'''
 ---
@@ -73,6 +74,35 @@ def main():
     addr = module.params["addr"]
     tls = module.params["tls"]
 
+    schema = 'https' if tls else 'http'
+    msg = 'everything is ok'
+    try:
+        response = r.get('{0}://{1}'.format(schema, addr))
+        site_status = response.status_code
+        rc = 0
+    except r.exceptions.RequestException as e:  # This is the correct syntax
+        msg = 'exception happen during requests execution'
+        site_status = 0
+
+    if site_status != 200:
+        if site_status != 0:
+            msg = 'something could went wrong'
+        rc = 1
+
+    # Если задача зафейлилась
+    if rc:
+        module.fail_json(changed=False,
+                         failed=True,
+                         result_str=site_status,
+                         rc=rc,
+                         msg=msg)
+    # Если задача успешно завершилась
+    else:
+        module.exit_json(changed=False,
+                         failed=False,
+                         result_str=site_status,
+                         rc=rc,
+                         msg=msg)
 
 if __name__ == "__main__":
     main()
